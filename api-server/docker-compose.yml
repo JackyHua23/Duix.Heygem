@@ -1,0 +1,40 @@
+version: '3.8'
+
+services:
+  heygem-api:
+    build: .
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=production
+      - PORT=3000
+      - LOG_LEVEL=info
+      - PROCESSING_INTERVAL=2000
+      - MAX_RETRIES=3
+      - QUEUE_POLLING_INTERVAL=5000
+    volumes:
+      - heygem_data:/app/data
+      - heygem_uploads:/app/uploads
+      - heygem_temp:/app/temp
+      - heygem_logs:/app/logs
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+volumes:
+  heygem_data:
+    driver: local
+  heygem_uploads:
+    driver: local
+  heygem_temp:
+    driver: local
+  heygem_logs:
+    driver: local
+
+networks:
+  default:
+    name: heygem-network
